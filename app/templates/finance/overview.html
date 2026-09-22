@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Expense Analytics</h5>
+    </div>
+    <div class="card-body">
+        {% if category_totals %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Total Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for name, total in category_totals %}
+                        <tr>
+                            <td>{{ name }}</td>
+                            <td>${{ '%.2f'|format(total) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">No analytics available yet. Add some expenses to see trends.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

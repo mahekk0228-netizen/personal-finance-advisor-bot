@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Expenses{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Add Expense</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.title.label(class='form-label') }}
+                        {{ form.title(class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.amount.label(class='form-label') }}
+                        {{ form.amount(class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.expense_date.label(class='form-label') }}
+                        {{ form.expense_date(class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.category_id.label(class='form-label') }}
+                        {{ form.category_id(class='form-select') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.notes.label(class='form-label') }}
+                        {{ form.notes(class='form-control') }}
+                    </div>
+                    {{ form.submit(class='btn btn-success') }}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Expense Records</h5>
+            </div>
+            <div class="card-body">
+                {% if expenses %}
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in expenses %}
+                                <tr>
+                                    <td>{{ item.title }}</td>
+                                    <td>{{ item.category.name }}</td>
+                                    <td>${{ '%.2f'|format(item.amount) }}</td>
+                                    <td>{{ item.expense_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No expenses recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Income{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Add Income</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.source.label(class='form-label') }}
+                        {{ form.source(class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.amount.label(class='form-label') }}
+                        {{ form.amount(class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.received_date.label(class='form-label') }}
+                        {{ form.received_date(class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.notes.label(class='form-label') }}
+                        {{ form.notes(class='form-control') }}
+                    </div>
+                    {{ form.submit(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Income Records</h5>
+            </div>
+            <div class="card-body">
+                {% if incomes %}
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in incomes %}
+                                <tr>
+                                    <td>{{ item.source }}</td>
+                                    <td>${{ '%.2f'|format(item.amount) }}</td>
+                                    <td>{{ item.received_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No income recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

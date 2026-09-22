@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Overview{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="text-muted">Total Income</div>
+                <h4>${{ '%.2f'|format(total_income) }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="text-muted">Total Expenses</div>
+                <h4>${{ '%.2f'|format(total_expense) }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="text-muted">Budget Total</div>
+                <h4>${{ '%.2f'|format(budgets|sum(attribute='planned_amount')) if budgets else '0.00' }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Financial Dashboard</h2>
+    <span class="badge bg-primary">Welcome, {{ current_user.full_name }}</span>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">Total Income</div>
+                <h4 class="mt-2">${{ '%.2f'|format(summary.total_income) }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">Total Expenses</div>
+                <h4 class="mt-2">${{ '%.2f'|format(summary.total_expense) }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">Budget Planned</div>
+                <h4 class="mt-2">${{ '%.2f'|format(summary.total_budget) }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">Net Savings</div>
+                <h4 class="mt-2">${{ '%.2f'|format(summary.net_savings) }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">AI Financial Advice</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ financial_advice }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Income</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_income %}
+                    <ul class="list-group list-group-flush">
+                        {% for item in recent_income %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ item.source }}</span>
+                                <strong>${{ '%.2f'|format(item.amount) }}</strong>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No income yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Expenses</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_expenses %}
+                    <ul class="list-group list-group-flush">
+                        {% for item in recent_expenses %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ item.title }}</span>
+                                <strong>${{ '%.2f'|format(item.amount) }}</strong>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No expenses yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Category Spending</h5>
+            </div>
+            <div class="card-body">
+                {% if summary.category_totals %}
+                    <ul class="list-group list-group-flush">
+                        {% for name, total in summary.category_totals %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>{{ name }}</span>
+                                <strong>${{ '%.2f'|format(total) }}</strong>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">No category totals yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

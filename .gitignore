@@ -1,0 +1,6 @@
+SECRET_KEY=change-me
+DATABASE_URL=sqlite:///app.db
+AI_PROVIDER=gemini
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+APP_NAME=Personal Finance Advisor
