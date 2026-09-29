@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FinPilot · Personal Finance Advisor Bot</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=Figtree:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eaf3f0;--panel:#fff;--ink:#0f2d2b;--mute:#5a7370;--line:#cfe0db;--brand:#0b5d55;--brandtx:#fff;--acc:#ff6b4a;--ok:#12a072;--warn:#d38b00;--bad:#d9433a;--bot:#e3f1ed;--me:#0b5d55;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1a19;--panel:#12292a;--ink:#e6f4f1;--mute:#93b0ac;--line:#254340;--brand:#2fc4a8;--brandtx:#062321;--acc:#ff8a6e;--ok:#3fd6a0;--warn:#f0b429;--bad:#ff7a70;--bot:#1a3a3a;--me:#1f8f7b}}
+:root[data-theme="dark"]{--bg:#0a1a19;--panel:#12292a;--ink:#e6f4f1;--mute:#93b0ac;--line:#254340;--brand:#2fc4a8;--brandtx:#062321;--acc:#ff8a6e;--ok:#3fd6a0;--warn:#f0b429;--bad:#ff7a70;--bot:#1a3a3a;--me:#1f8f7b}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.15}
+.wrap{max-width:1140px;margin:0 auto;padding:0 18px}
+header{padding:20px 0 8px;display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap}
+header h1{font-size:clamp(28px,4.5vw,42px);font-weight:800}
+header p{margin:6px 0 0;color:var(--mute);max-width:56ch}
+.logo{color:var(--acc)}
+select,input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.grid{display:grid;grid-template-columns:400px 1fr;gap:18px;padding:12px 0 30px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+.panel h2{font-size:20px;margin-bottom:12px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f label{font-size:13px;color:var(--mute);display:block}
+.f label input{margin-top:3px}
+.stack{display:grid;gap:18px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--bg);border-radius:12px;padding:10px 12px}
+.kpi small{color:var(--mute);font-size:12.5px;display:block}
+.kpi b{font:800 20px Fraunces,serif}
+.score{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.big{font:800 46px Fraunces,serif;line-height:1}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-top:8px}
+.legend span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:var(--c)}
+.chat{display:flex;flex-direction:column;height:560px}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px 10px}
+.m{max-width:86%;padding:10px 14px;border-radius:16px;white-space:pre-wrap}
+.m.bot{background:var(--bot);border-bottom-left-radius:4px}
+.m.me{background:var(--me);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.chips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:20px;padding:6px 12px;font:500 13.5px Figtree;cursor:pointer}
+.chips button:hover{border-color:var(--brand);color:var(--brand)}
+.send{display:flex;gap:8px}
+.send button{background:var(--brand);color:var(--brandtx);border:0;border-radius:10px;padding:0 20px;font:700 15px Figtree;cursor:pointer}
+.note{font-size:12.5px;color:var(--mute);padding:6px 0 26px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.chat{height:520px}}
+@media(max-width:520px){.kpis{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div><h1><span class="logo">◆</span> FinPilot</h1><p>Your personal finance advisor bot. Enter your numbers, then ask about budgeting, debt, emergency funds or goals.</p></div>
+<div style="width:120px"><select id="cur" aria-label="Currency"><option value="₹">₹ INR</option><option value="$">$ USD</option><option value="€">€ EUR</option><option value="£">£ GBP</option></select></div>
+</header>
+
+<div class="grid">
+<div class="stack">
+<div class="panel">
+<h2>Your numbers (monthly)</h2>
+<div class="f">
+<label>Income<input id="inc" type="number" value="60000" min="0"></label>
+<label>Needs (rent, food, bills)<input id="need" type="number" value="28000" min="0"></label>
+<label>Wants (fun, shopping)<input id="want" type="number" value="14000" min="0"></label>
+<label>Debt EMI / payments<input id="emi" type="number" value="6000" min="0"></label>
+<label>Saved / invested each month<input id="sav" type="number" value="8000" min="0"></label>
+<label>Current savings<input id="cs" type="number" value="90000" min="0"></label>
+<label>Debt balance<input id="db" type="number" value="150000" min="0"></label>
+<label>Debt interest % / year<input id="dr" type="number" value="12" min="0" step="0.1"></label>
+<label>Goal amount<input id="ga" type="number" value="1000000" min="0"></label>
+<label>Goal in years<input id="gy" type="number" value="5" min="1"></label>
+<label>Expected return % / year<input id="er" type="number" value="10" min="0" step="0.5"></label>
+</div>
+</div>
+<div class="panel" id="dash"></div>
+</div>
+
+<div class="panel chat">
+<h2>Ask FinPilot</h2>
+<div class="msgs" id="msgs" aria-live="polite"></div>
+<div class="chips" id="chips"></div>
+<div class="send"><input id="q" placeholder="Ask e.g. how do I reach my goal?" aria-label="Your question"><button id="go">Send</button></div>
+</div>
+</div>
+<p class="note">FinPilot gives general education based on the numbers you enter. It is not licensed financial advice; check with a qualified advisor before big decisions. Nothing you type leaves your browser.</p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const num=id=>Math.max(0,parseFloat($(id).value)||0);
+const fm=v=>$('cur').value+Math.round(v).toLocaleString('en-IN');
+function P(){const p={};['inc','need','want','emi','sav','cs','db','dr','ga','gy','er'].forEach(k=>p[k]=num(k));p.gy=Math.max(1,p.gy);
+ p.ess=p.need+p.emi;p.left=p.inc-p.need-p.want-p.emi-p.sav;
+ p.rate=p.inc?p.sav/p.inc*100:0;p.dti=p.inc?p.emi/p.inc*100:0;p.efm=p.ess?p.cs/p.ess:0;
+ const r=p.er/1200,n=p.gy*12,fv=p.cs*Math.pow(1+r,n);
+ p.fv0=fv+(r?p.sav*((Math.pow(1+r,n)-1)/r)*(1+r):p.sav*n);
+ p.sip=Math.max(0,r?(p.ga-fv)*r/((Math.pow(1+r,n)-1)*(1+r)):(p.ga-p.cs)/n);
+ const dm=p.dr/1200;p.dm=(p.emi>p.db*dm&&p.db>0)?(dm?-Math.log(1-p.db*dm/p.emi)/Math.log(1+dm):p.db/p.emi):(p.db>0?Infinity:0);
+ p.score=Math.round(Math.min(35,p.rate/20*35)+Math.min(30,p.efm/6*30)+(p.dti<=20?20:p.dti<=36?12:p.dti<=50?5:0)+(p.left>=0?15:0));
+ return p}
+function dash(){const p=P();
+ const tot=Math.max(p.inc,p.need+p.want+p.emi+p.sav)||1;
+ const seg=[['Needs',p.need,'#0b5d55'],['Wants',p.want,'#ff6b4a'],['Debt',p.emi,'#d38b00'],['Saved',p.sav,'#12a072']];
+ let a=0;const R=48,C=2*Math.PI*R;
+ const rings=seg.map(([n,v,c])=>{const l=v/tot*C;const s=`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${c}" stroke-width="18" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-a}" transform="rotate(-90 60 60)"/>`;a+=l;return s}).join('');
+ const col=p.score>=70?'var(--ok)':p.score>=45?'var(--warn)':'var(--bad)';
+ const verdict=p.score>=70?'Healthy':p.score>=45?'Needs attention':'At risk';
+ const gp=Math.min(100,p.fv0/(p.ga||1)*100);
+ $('dash').innerHTML=`<div class="score"><div class="big" style="color:${col}">${p.score}</div><div><b>Money health: ${verdict}</b><br><small style="color:var(--mute)">Based on savings rate, emergency fund, debt load and monthly balance</small></div></div>
+ <div class="kpis"><div class="kpi"><small>Savings rate</small><b>${p.rate.toFixed(0)}%</b></div><div class="kpi"><small>Debt-to-income</small><b>${p.dti.toFixed(0)}%</b></div><div class="kpi"><small>Emergency fund</small><b>${p.efm.toFixed(1)} mo</b></div></div>
+ <div style="display:flex;gap:16px;align-items:center;margin-top:14px"><svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Spending split">${rings}</svg><div class="legend" style="flex-direction:column;gap:4px;margin:0">${seg.map(s=>`<span style="--c:${s[2]}">${s[0]} ${fm(s[1])}</span>`).join('')}<span style="--c:var(--line)">Unallocated ${fm(Math.max(0,p.left))}</span></div></div>
+ ${p.left<0?`<p style="color:var(--bad);margin:10px 0 0">You are overspending by ${fm(-p.left)} a month.</p>`:''}
+ <p style="margin:14px 0 4px"><b>Goal progress</b> <small style="color:var(--mute)">projected ${fm(p.fv0)} of ${fm(p.ga)} in ${p.gy} yr</small></p><div class="bar"><i style="width:${gp}%"></i></div>`}
+
+function reply(t){const p=P(),s=t.toLowerCase(),has=(...w)=>w.some(x=>s.includes(x));
+ const yrs=p.dm===Infinity?null:(p.dm/12).toFixed(1);
+ if(has('hello','hi ','hey')||s.trim()==='hi')return `Hi! I'm FinPilot. Your money health score is ${p.score}/100. Ask me about budget, emergency fund, debt, goals or investing.`;
+ if(has('budget','spend','50/30','expense')){const nw=(p.need/p.inc*100)||0,w=(p.want/p.inc*100)||0;
+  return `A common guide is 50% needs, 30% wants, 20% savings and debt repayment.\nYou: needs ${nw.toFixed(0)}%, wants ${w.toFixed(0)}%, debt ${p.dti.toFixed(0)}%, saving ${p.rate.toFixed(0)}%.\n`+(nw>50?`Needs are above 50%. Look at rent, food delivery and subscriptions first.\n`:'')+(w>30?`Wants are above 30%. Trimming ${fm(p.want-p.inc*.3)} a month would move you back on track.\n`:'')+(p.left<0?`You're spending ${fm(-p.left)} more than you earn. Fix that before anything else.`:`You have ${fm(p.left)} unallocated each month that could go to savings.`)}
+ if(has('emergency','rainy','safety')){const tgt=p.ess*6;
+  return `Aim for 6 months of essential costs: ${fm(tgt)} for you.\nYou have ${fm(p.cs)}, about ${p.efm.toFixed(1)} months.\n`+(p.cs>=tgt?'You are covered. Extra money can go to goals.':`Gap: ${fm(tgt-p.cs)}. At ${fm(Math.max(p.sav,1))} a month that takes about ${Math.ceil((tgt-p.cs)/Math.max(p.sav,1))} months. Keep it in a savings account or liquid fund, not stocks.`)}
+ if(has('debt','loan','emi','credit card','pay off')){
+  if(!p.db)return 'You have no debt entered. Keep it that way, and avoid carrying credit card balances.';
+  return `Debt: ${fm(p.db)} at ${p.dr}% with ${fm(p.emi)} paid monthly.\n`+(yrs===null?'Your payment does not even cover the interest, so the balance is growing. Raise your payment first.':`At this pace you are debt-free in about ${yrs} years.`)+`\nDebt-to-income is ${p.dti.toFixed(0)}% (aim below 36%).\n`+(p.dr>p.er?`Your loan rate (${p.dr}%) is above the return you expect (${p.er}%), so extra cash usually earns more by paying the debt down. Pay highest interest first (avalanche method).`:'Your loan rate is below your expected return, so paying on schedule while investing is reasonable.')}
+ if(has('goal','target','reach','sip','invest','retire','house','car')){
+  const gap=p.ga-p.fv0;
+  return `Goal: ${fm(p.ga)} in ${p.gy} years at ${p.er}% a year.\nAt your current ${fm(p.sav)} a month you'd reach about ${fm(p.fv0)}.\n`+(gap<=0?'You are on track. Nice work.':`To hit the goal you need about ${fm(p.sip)} a month (${fm(Math.max(0,p.sip-p.sav))} more than now).`)+(p.left>0?`\nYou have ${fm(p.left)} unallocated, which could cover ${p.left>=p.sip-p.sav?'the whole gap':'part of the gap'}.`:'')+`\nReturns are not guaranteed. Try lowering the expected return to see a cautious case.`}
+ if(has('save','saving','how much')){return `You save ${p.rate.toFixed(0)}% of income (${fm(p.sav)}). Aim for at least 20%, which is ${fm(p.inc*.2)} for you.\n`+(p.rate>=20?'You are above the target.':`Try automating a transfer on payday. Even ${fm(Math.min(p.left>0?p.left:p.inc*.02,p.inc*.2-p.sav))} more helps.`)}
+ if(has('score','health','how am i')){return `Score ${p.score}/100.\nSavings rate ${p.rate.toFixed(0)}%, emergency fund ${p.efm.toFixed(1)} months, debt-to-income ${p.dti.toFixed(0)}%, monthly balance ${p.left>=0?'positive':'negative'}.\nBiggest lever: `+(p.efm<3?'build your emergency fund.':p.rate<20?'raise your savings rate.':p.dti>36?'reduce debt payments.':'keep going and invest towards your goal.')}
+ if(has('tax'))return 'Tax rules differ by country and change often, so I can\'t give exact figures. General idea: use tax-advantaged accounts offered where you live and keep records of receipts. A local tax professional can check your case.';
+ if(has('credit score','cibil'))return 'To improve a credit score: pay every bill on time, keep card usage under 30% of the limit, avoid many new loan applications, and keep old accounts open.';
+ return 'I can help with: budget, emergency fund, debt payoff, savings rate, goals and investing, or your money health score. Try one of the buttons below.'}
+
+const msgs=$('msgs');
+function say(t,c){const d=document.createElement('div');d.className='m '+c;d.textContent=t;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight}
+function ask(t){t=t.trim();if(!t)return;say(t,'me');$('q').value='';setTimeout(()=>say(reply(t),'bot'),350)}
+$('go').onclick=()=>ask($('q').value);
+$('q').onkeydown=e=>{if(e.key==='Enter')ask($('q').value)};
+['Review my budget','Emergency fund?','Pay off my debt','How do I reach my goal?','How am I doing?'].forEach(t=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>ask(t);$('chips').appendChild(b)});
+document.querySelectorAll('input[type=number],#cur').forEach(e=>e.addEventListener('input',dash));
+dash();say('Hi! I\'m FinPilot. I read the numbers on the left and give you tailored guidance. Change them any time, then ask me a question.','bot');
+</script>
+</body>
+</html>
