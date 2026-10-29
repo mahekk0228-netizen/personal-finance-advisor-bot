@@ -1,6 +1,11 @@
 # Personal Finance Advisor Bot
 
 [▶ Watch the demo](finpilot_demo.mp4)
+## Documentation
+
+- [Demo Video](finpilot_demo.mp4)
+- [Software Requirements Specification](SRS.md)
+- [Demo Script](DEMO_SCRIPT.md)
 
 A Flask-based AI-powered personal finance management application for tracking income, expenses, budgets, financial summaries, and AI-generated recommendations.
 
